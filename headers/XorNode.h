@@ -36,12 +36,20 @@ public:
 	void add_ptr_to_xor(node_ptr ptr) {
 		if (address_xor == nullptr)
 			address_xor = ptr.get();
-
-		address_xor = xor_two_ptrs(address_xor, ptr.get());
+		else
+			address_xor = xor_two_ptrs(address_xor, ptr.get());
 	}
 
-	XorNode<T, Alloc>* get_other_ptr(node_ptr ptr) {
-		return xor_two_ptrs(address_xor, ptr.get());;
+	node_ptr get_other_ptr(node_ptr ptr) {
+		if (address_xor == ptr.get())
+			return nullptr;
+
+		c_node_ptr other = xor_two_ptrs(address_xor, ptr.get());
+
+		if (other == nullptr)
+			return nullptr;
+		else
+			return std::shared_ptr<XorNode<T, Alloc> >(other);
 	}
 
 	XorNode<T, Alloc>* get_address_xor() {
@@ -55,6 +63,10 @@ public:
 	void replace_ptr_from_xor_addr(node_ptr old_ptr, node_ptr new_ptr) {
 		delete_ptr_from_xor_addr(old_ptr);
 		add_ptr_to_xor(new_ptr);
+	}
+
+	T& get_value() {
+		return value;
 	}
 
 private:
