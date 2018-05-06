@@ -14,6 +14,7 @@ private:
 public:
 	using sizetype = size_t;
 	using node_ptr = std::shared_ptr<XorNode<T, Alloc> >;
+	using c_node_ptr = XorNode<T, Alloc>*;
 	using node = XorNode<T, Alloc>;
 	using iterator = XorListIterator<T, Alloc>;
 
@@ -33,6 +34,9 @@ public:
 	void pop_front();
 
 	void insert_before(iterator& iter, const T&);
+	void insert_before(iterator& iter, T&& val);
+	void insert_after(iterator& iter, const T&);
+	void insert_after(iterator& iter, T&& val);
 
 	XorListIterator<T, Alloc> begin() {
 		//return XorListIterator<T, Alloc>(make_shared(head->get_address_xor()), head);
@@ -76,7 +80,7 @@ private:
 		ending = pushing;
 	}
 
-	void push_between(node_ptr& left, node_ptr& pushing, node_ptr& right) {
+	void push_between(c_node_ptr& left, c_node_ptr& pushing, c_node_ptr& right) {
 		sz++;
 
 		pushing->add_ptr_to_xor(left);
@@ -166,9 +170,32 @@ void XorList<T, Alloc>::pop_back() { //TODO CHECK IF HEAD == TAIL
 
 template<typename T, class Alloc>
 void XorList<T, Alloc>::insert_before(iterator& iter, const T& val) {
-	node_ptr inserting = create_node(val);
-	push_between(iter.prev_node, inserting, iter.node);
-	iter.prev_node = inserting;
+	c_node_ptr inserting = new node(val);
+	push_between(iter.get_prev_node(), inserting, iter.get_node());
+	iter.replace_prev_node(inserting);
+}
+
+template<typename T, class Alloc>
+void XorList<T, Alloc>::insert_before(iterator& iter, T&& val) {
+	c_node_ptr inserting = new node(std::move(val));
+	push_between(iter.get_prev_node(), inserting, iter.get_node());
+	iter.replace_prev_node(inserting);
+}
+
+template<typename T, class Alloc>
+void XorList<T, Alloc>::insert_after(iterator& iter, const T& val) {
+	c_node_ptr inserting = new node(val);
+	push_between(iter.get_prev_node(), inserting, iter.get_node());
+	iter.replace_prev_node(inserting);
+}
+
+template<typename T, class Alloc>
+void XorList<T, Alloc>::insert_after(iterator& iter, T&& val) {
+	c_node_ptr inserting = new node(std::move(val));
+
+	c_node_ptr next = iter.get_node()->get_other_ptr(iter.get_prev_node());
+	push_between(iter.get_node(), inserting, next);
+	//iter.replace_prev_node(inserting);
 }
 
 void random_check(int count_of_oper) {

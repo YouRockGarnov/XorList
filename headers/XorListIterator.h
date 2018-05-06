@@ -10,10 +10,11 @@ class XorList;
  public:
 	 friend XorList<T, Alloc>;
 
- 	using node_ptr = std::shared_ptr<XorNode<T, Alloc> >;
+ 	using node_ptr = XorNode<T, Alloc>*;
+	using shared_ptr = std::shared_ptr<XorNode<T, Alloc> >;
 	using c_node_ptr = XorNode<T, Alloc>*;
 
- 	XorListIterator(node_ptr prev, node_ptr rec_node) : node(rec_node), prev_node(prev) {}
+ 	XorListIterator(shared_ptr prev, shared_ptr rec_node) : node(rec_node.get()), prev_node(prev.get()) {}
  	XorListIterator() = default;
 
  	XorListIterator(const XorListIterator &other) = default;
@@ -56,10 +57,6 @@ class XorList;
  		return *bi;
  	}
 
-	~XorListIterator() {
-		//prev_node.~shared_ptr();
-		//node.~shared_ptr();
-	}
 // 	bool operator==(const XorListIterator &other) const {
 // 		return (index == other.index && list_ptr == other.list_ptr);
 // 	}
@@ -76,11 +73,23 @@ class XorList;
 // 		return (index <= other.index);
 // 	}
 
-	node_ptr make_node_ptr(c_node_ptr& ptr) {
-		return std::shared_ptr<XorNode<T, Alloc> >(ptr);
+	node_ptr make_node_ptr(std::shared_ptr<XorNode<T, Alloc> >& ptr) {
+		return ptr.get();
 	}
 
  private:
+	 c_node_ptr& get_prev_node() {
+		 return prev_node;
+	 }
+
+	 c_node_ptr& get_node() {
+		 return node;
+	 }
+
+	 void replace_prev_node(c_node_ptr ptr) {
+		 prev_node = ptr;
+	}
+
  	node_ptr prev_node;
 	node_ptr node;
  };

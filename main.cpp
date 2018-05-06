@@ -15,12 +15,20 @@ int main() {
 	iter++;
 	std::cout << *iter;
 
-	xl.insert_before(iter, 42);
+	int check = 42;
 
 	iter--;
 	std::cout << *iter;
 
-	iter.~XorListIterator();
+	xl.insert_after(iter, std::move(check));
+
+	XorListIterator<int, std::allocator<int> > test = xl.begin();
+	std::cout << *test;
+	test++;
+	std::cout << *test;
+	test++;
+	std::cout << *test;
+
 
 	system("pause");
 }

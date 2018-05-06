@@ -40,6 +40,13 @@ public:
 			address_xor = xor_two_ptrs(address_xor, ptr.get());
 	}
 
+	void add_ptr_to_xor(c_node_ptr ptr) {
+		if (address_xor == nullptr)
+			address_xor = ptr;
+		else
+			address_xor = xor_two_ptrs(address_xor, ptr);
+	}
+
 	node_ptr get_other_ptr(node_ptr ptr) {
 		if (address_xor == ptr.get())
 			return nullptr;
@@ -52,6 +59,18 @@ public:
 			return std::shared_ptr<XorNode<T, Alloc> >(other);
 	}
 
+	c_node_ptr get_other_ptr(c_node_ptr ptr) {
+		if (address_xor == ptr)
+			return nullptr;
+
+		c_node_ptr other = xor_two_ptrs(address_xor, ptr);
+
+		if (other == nullptr)
+			return nullptr;
+		else
+			return other;
+	}
+
 	XorNode<T, Alloc>* get_address_xor() {
 		return address_xor;
 	}
@@ -60,7 +79,16 @@ public:
 		add_ptr_to_xor(ptr); //xor is a reverse operation for xor
 	}
 
+	void delete_ptr_from_xor_addr(c_node_ptr ptr) {
+		add_ptr_to_xor(ptr); //xor is a reverse operation for xor
+	}
+
 	void replace_ptr_from_xor_addr(node_ptr old_ptr, node_ptr new_ptr) {
+		delete_ptr_from_xor_addr(old_ptr);
+		add_ptr_to_xor(new_ptr);
+	}
+
+	void replace_ptr_from_xor_addr(c_node_ptr old_ptr, c_node_ptr new_ptr) {
 		delete_ptr_from_xor_addr(old_ptr);
 		add_ptr_to_xor(new_ptr);
 	}
