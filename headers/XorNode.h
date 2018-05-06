@@ -69,6 +69,8 @@ public:
 		return value;
 	}
 
+	~XorNode() {}
+
 private:
 	XorNode<T, Alloc>* address_xor = nullptr;
 	T value;

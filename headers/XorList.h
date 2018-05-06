@@ -15,6 +15,7 @@ public:
 	using sizetype = size_t;
 	using node_ptr = std::shared_ptr<XorNode<T, Alloc> >;
 	using node = XorNode<T, Alloc>;
+	using iterator = XorListIterator<T, Alloc>;
 
 	explicit XorList(const Alloc& alloc = Alloc()) : _alloc(alloc) { init(); }
 
@@ -30,6 +31,8 @@ public:
 
 	void pop_back();
 	void pop_front();
+
+	void insert_before(iterator& iter, const T&);
 
 	XorListIterator<T, Alloc> begin() {
 		//return XorListIterator<T, Alloc>(make_shared(head->get_address_xor()), head);
@@ -71,6 +74,16 @@ private:
 		ending->add_ptr_to_xor(pushing); //ptr on XorNode, not on value
 		pushing->add_ptr_to_xor(ending);
 		ending = pushing;
+	}
+
+	void push_between(node_ptr& left, node_ptr& pushing, node_ptr& right) {
+		sz++;
+
+		pushing->add_ptr_to_xor(left);
+		pushing->add_ptr_to_xor(right);
+
+		left->replace_ptr_from_xor_addr(right, pushing);
+		right->replace_ptr_from_xor_addr(left, pushing);
 	}
 };
 
@@ -149,6 +162,13 @@ void XorList<T, Alloc>::pop_back() { //TODO CHECK IF HEAD == TAIL
 			tail = head = nullptr;
 		else
 			tail = nullptr;
+}
+
+template<typename T, class Alloc>
+void XorList<T, Alloc>::insert_before(iterator& iter, const T& val) {
+	node_ptr inserting = create_node(val);
+	push_between(iter.prev_node, inserting, iter.node);
+	iter.prev_node = inserting;
 }
 
 void random_check(int count_of_oper) {
