@@ -77,6 +77,10 @@ class XorList;
 		return ptr.get();
 	}
 
+	node_ptr& next() {
+		return get_node()->get_other_ptr(get_prev_node());
+	}
+
  private:
 	 c_node_ptr& get_prev_node() {
 		 return prev_node;
