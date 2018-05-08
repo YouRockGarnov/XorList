@@ -14,7 +14,7 @@ class XorList;
 	using shared_ptr = std::shared_ptr<XorNode<T, Alloc> >;
 	using c_node_ptr = XorNode<T, Alloc>*;
 
- 	XorListIterator(shared_ptr prev, shared_ptr rec_node) : node(rec_node.get()), prev_node(prev.get()) {}
+ 	XorListIterator(node_ptr prev, node_ptr rec_node) : node(rec_node), prev_node(prev) {}
  	XorListIterator() = default;
 
  	XorListIterator(const XorListIterator &other) = default;
@@ -77,7 +77,7 @@ class XorList;
 		return ptr.get();
 	}
 
-	node_ptr& next() {
+	node_ptr next() {
 		return get_node()->get_other_ptr(get_prev_node());
 	}
 
@@ -94,6 +94,6 @@ class XorList;
 		 prev_node = ptr;
 	}
 
- 	node_ptr prev_node;
-	node_ptr node;
+ 	node_ptr prev_node; //near to head
+	node_ptr node; //near to tail
  };

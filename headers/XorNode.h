@@ -28,7 +28,7 @@ public:
 		else
 			address_xor = (intptr_t) nullptr;
 	}
-
+	
 	XorNode<T, Alloc>* xor_two_ptrs(c_node_ptr left, c_node_ptr right) {
 		return (XorNode<T, Alloc>*) ((intptr_t) left ^ (intptr_t) right);
 	}

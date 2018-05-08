@@ -11,8 +11,26 @@ int main() {
 	StackAlloc<int> sa;
 	XorList<int, std::allocator<int> > xl(stdal);
 
+	xl.push_front(5);
+	XorListIterator<int, std::allocator<int> > titer = xl.begin();
+	xl.insert_before(titer, 6);
+	xl.push_front(4);
+	xl.push_back(7);
+	xl.pop_back();
+	xl.pop_back();
 	xl.push_back(5);
-	xl.push_back(6);
+	xl.push_front(7);
+
+	titer = xl.begin();
+	++titer; 
+	++titer; 
+	++titer;
+	xl.erase(titer);
+
+	titer = xl.begin();
+	++titer;
+	++titer;
+
 	XorListIterator<int, std::allocator<int> > iter = xl.begin();
 	std::cout << *iter;
 	iter++;
@@ -57,6 +75,15 @@ int random_checking() {
 		}
 		std::cout << std::endl;*/
 
+		if (xlist.size() == 2)
+			std::cout<<' ';
+
+		auto xiter = xlist.begin();
+		for (int j = 0; j < xlist.size(); ++j) {
+			std::cout << *xiter << " ";
+			++xiter;
+		} std::cout << '\n';
+
 		int choice = rand() % 6;
 
 		switch (choice) {
@@ -66,16 +93,19 @@ int random_checking() {
 
                 int where = rand() % 2;
 
+				std::cout << "push " << pushing;
+
                 if (where == 0) {
                     xlist.push_front(pushing);
                     stdlist.push_front(pushing);
+
+					std::cout << " front\n";
                 } else {
                     xlist.push_back(pushing);
                     stdlist.push_back(pushing);
-                }
 
-				xlist.push_back(pushing);
-				stdlist.push_back(pushing);
+					std::cout << " back\n";
+                }
 
 				break;
 			}
@@ -87,6 +117,9 @@ int random_checking() {
 				if (stdlist.empty()) {
 					xlist.push_back(pushing);
 					stdlist.push_back(pushing);
+
+					std::cout << "push " << pushing;
+					std::cout << " back\n";
 					continue;
 				}
 
@@ -98,6 +131,8 @@ int random_checking() {
 					++iter;
                     ++xiter;
 				}
+
+				std::cout << "insert " << pushing << " after " << index << "\n";
 
 				stdlist.insert(iter, pushing);
                 xlist.insert_after(xiter, pushing);
@@ -118,6 +153,8 @@ int random_checking() {
                     ++iter;
                     ++xiter;
                 }
+
+				std::cout << "erase " << index << "\n";
 
                 xlist.erase(xiter);
 				stdlist.erase(iter);
@@ -140,6 +177,8 @@ int random_checking() {
                     ++xiter;
                 }
 
+				std::cout << "set " << val << " from " << index << "\n";
+
                 *iter = val;
                 *xiter = val;
 
@@ -154,11 +193,11 @@ int random_checking() {
                 auto xiter = xlist.begin();
                 auto iter = stdlist.begin();
                 for (int j = 0; j < stdlist.size(); ++j) {
-                    ++iter;
-                    ++xiter;
-
                     if (*iter != *xiter)
                         std::cout << "Error: " << *iter << " from std != " << *xiter;
+
+					++iter;
+					++xiter;
                 }
 
 				break;
@@ -170,10 +209,16 @@ int random_checking() {
 
                 int where = rand() % 2;
 
+				std::cout << "pop ";
+
                 if (where == 0) {
+					std::cout << "front\n";
+
                     xlist.pop_front();
                     stdlist.pop_front();
                 } else {
+					std::cout << "back\n";
+
                     xlist.pop_back();
                     stdlist.pop_back();
                 }
@@ -184,4 +229,6 @@ int random_checking() {
 	}
 
 	system("pause");
+
+	return 0;
 }

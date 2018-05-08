@@ -13,8 +13,10 @@ private:
 
 public:
 	using sizetype = size_t;
-	using node_ptr = std::shared_ptr<XorNode<T, Alloc> >;
+	//using node_ptr = std::shared_ptr<XorNode<T, Alloc> >;
+	
 	using c_node_ptr = XorNode<T, Alloc>*;
+	using node_ptr = c_node_ptr;
 	using node = XorNode<T, Alloc>;
 	using iterator = XorListIterator<T, Alloc>;
 
@@ -55,25 +57,30 @@ private:
 	}
 
 	node_ptr create_node(T&& value) {
-		return std::make_shared<XorNode<T, Alloc> >(XorNode<T, Alloc>(std::move(value)));
-	}
-
-	node_ptr create_node(const T& value) {
-		sz++;
-		return std::make_shared<XorNode<T, Alloc> >(XorNode<T, Alloc>(value));
+		//return std::make_shared<XorNode<T, Alloc> >(XorNode<T, Alloc>(std::move(value)));
+		return new XorNode<T, Alloc>(std::move(value));
 	}
 
 	void init() {
 
 	}
 
+	node_ptr create_node(const T& value) {
+		//return std::make_shared<XorNode<T, Alloc> >(XorNode<T, Alloc>(value));
+		return new XorNode<T, Alloc>(value);
+	}
+
 	void create_head_tail(const T& val) {
+		sz++;
 		node_ptr t = create_node(val);
 		tail = t;
 		head = t;
 	}
 
 	void push_after(node_ptr& pushing, node_ptr& ending) {
+		/*if (sz == 1)
+			ending = pushing;*/
+
 		sz++;
 
 		ending->add_ptr_to_xor(pushing); //ptr on XorNode, not on value
@@ -82,6 +89,15 @@ private:
 	}
 
 	void push_between(c_node_ptr& left, c_node_ptr& pushing, c_node_ptr& right) {
+		/*if (sz == 1) {
+			if(left == nullptr)
+				push_after(pushing, right);
+			else
+				push_after(pushing, left);
+
+			return;
+		}*/
+
 		sz++;
 
         if(left == nullptr){
@@ -153,7 +169,7 @@ void XorList<T, Alloc>::pop_front() {
 
 	if (prev != nullptr) {
 		prev->delete_ptr_from_xor_addr(head);
-		head = std::shared_ptr<node>(prev); //need check!!!
+		head = prev; //need check!!!
 	} else
 		if (tail == head)
 			tail = head = nullptr;
@@ -165,14 +181,16 @@ template<typename T, class Alloc>
 void XorList<T, Alloc>::pop_back() { //TODO CHECK IF HEAD == TAIL
 	sz--;
 
-	XorNode<T, Alloc>* next = head->get_address_xor();
+	XorNode<T, Alloc>* next = tail->get_address_xor();
 
 	if (next != nullptr) {
 		next->delete_ptr_from_xor_addr(tail);
-		tail = std::shared_ptr<node>(next);
+		tail = next;
 	} else
-		if (tail == head)
-			tail = head = nullptr;
+		if (tail == head) {
+			tail = nullptr;
+			head = nullptr;
+		}
 		else
 			tail = nullptr;
 }
@@ -181,7 +199,16 @@ template<typename T, class Alloc>
 void XorList<T, Alloc>::insert_before(iterator& iter, const T& val) {
 	c_node_ptr inserting = new node(val);
 
-	push_between(iter.get_prev_node(), inserting, iter.get_node());
+	if (sz == 1) {
+		head = inserting;
+		iter.prev_node = inserting;
+		iter.node = tail;
+
+		head->add_ptr_to_xor(tail);
+		tail->add_ptr_to_xor(head);
+	}
+
+	push_between(iter.prev_node, inserting, iter.node);
 	iter.replace_prev_node(inserting);
 }
 
@@ -189,7 +216,16 @@ template<typename T, class Alloc>
 void XorList<T, Alloc>::insert_before(iterator& iter, T&& val) {
 	c_node_ptr inserting = new node(std::move(val));
 
-	push_between(iter.get_prev_node(), inserting, iter.get_node());
+	if (sz == 1) {
+		head = inserting;
+		iter.prev_node = inserting;
+		iter.node = tail;
+
+		head->add_ptr_to_xor(tail);
+		tail->add_ptr_to_xor(head);
+	}
+
+	push_between(iter.prev_node, inserting, iter.node);
 	iter.replace_prev_node(inserting);
 }
 
@@ -197,23 +233,48 @@ template<typename T, class Alloc>
 void XorList<T, Alloc>::insert_after(iterator& iter, const T& val) {
 	c_node_ptr inserting = new node(val);
 
-	push_between(iter.get_node(), inserting, iter.next());
+	if (sz == 1) {
+		tail = inserting;
+		iter.prev_node = head;
+		iter.node = tail;
+
+		head->add_ptr_to_xor(tail);
+		tail->add_ptr_to_xor(head);
+	}
+
+    c_node_ptr next = iter.next();
+	push_between(iter.node, inserting, next);
 }
 
 template<typename T, class Alloc>
 void XorList<T, Alloc>::insert_after(iterator& iter, T&& val) {
 	c_node_ptr inserting = new node(std::move(val));
 
-	c_node_ptr next = iter.get_node()->get_other_ptr(iter.get_prev_node());
-	push_between(iter.get_node(), inserting, next);
+	if (sz == 1) {
+		tail = inserting;
+		iter.prev_node = head;
+		iter.node = tail;
+
+		head->add_ptr_to_xor(tail);
+		tail->add_ptr_to_xor(head);
+	}
+
+	c_node_ptr next = iter.next();
+	push_between(iter.node, inserting, next);
 	//iter.replace_prev_node(inserting);
 }
 
 template<typename T, class Alloc>
 void XorList<T, Alloc>::erase(iterator& iter) {
+	/*if (sz == 2)
+		tail = head;*/
+	sz--;
 	c_node_ptr next = iter.next();
 
-	if (iter.get_prev_node() == nullptr) {
+	if (iter.get_prev_node() == nullptr && next == nullptr) {
+		//delete iter.node;
+		iter.node = nullptr;
+	} else if (iter.get_prev_node() == nullptr) {
 		//delete iter.node;
 		next->delete_ptr_from_xor_addr(iter.get_node());
 		*iter.node = *next;
