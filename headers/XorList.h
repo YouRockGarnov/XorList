@@ -290,38 +290,19 @@ void XorList<T, Alloc>::insert_after(iterator& iter, T&& val) {
 
 template<typename T, class Alloc>
 void XorList<T, Alloc>::erase(iterator& iter) {
-	if (sz == 2) {
-		//sz--;
-		if (iter.node == tail)
-			tail = head;
-		else
-			head = tail;
-
-		//return;
-	}
-
-
 	sz--;
-	c_node_ptr next = iter.next(); //CHECK
+	c_node_ptr left = iter.prev_node;
+	c_node_ptr right = iter.next();
+	c_node_ptr toDelete = iter.node;
 
-	if (iter.get_prev_node() == nullptr && next == nullptr) {
-		//delete iter.node;
-		iter.node = nullptr;
-	} else if (iter.get_prev_node() == nullptr) {
-		//delete iter.node;
-		next->delete_ptr_from_xor_addr(iter.get_node());
-		*iter.node = *next;
-	} else if (next == nullptr) {
-		//delete iter.node;
-		iter.prev_node->delete_ptr_from_xor_addr(iter.get_node());
-		*iter.node = *iter.prev_node;
-	} else {
-		next->replace_ptr_from_xor_addr(iter.get_node(), iter.get_prev_node());
-		iter.prev_node->replace_ptr_from_xor_addr(iter.get_node(), next);
-
-		//delete iter.node;
-		*iter.node = *next;
-	}
+	if (left != nullptr)
+		left->replace_ptr_from_xor_addr(toDelete, right);
+	else
+		head = right;
+	if (right != nullptr)
+		right->replace_ptr_from_xor_addr(toDelete, left);
+	else
+		tail = left;
 }
 
 void random_check(int count_of_oper) {

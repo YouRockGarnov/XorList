@@ -4,6 +4,7 @@
 #include "headers\XorListIterator.h"
 //#include "StackAllocator\headers\StackAlloc.h"
 
+bool DEBUG = false;
 int random_checking();
 
 int main() {
@@ -105,14 +106,14 @@ int random_checking() {
 		}
 		std::cout << std::endl;*/
 
-		if (xlist.size() == 2)
+/*		if (xlist.size() == 2)
 			std::cout<<' ';
 
 		auto xiter = xlist.begin();
 		for (int j = 0; j < xlist.size(); ++j) {
 			std::cout << *xiter << " ";
 			++xiter;
-		} std::cout << '\n';
+		} std::cout << '\n';*/
 
 		int choice = rand() % 6;
 
@@ -122,18 +123,20 @@ int random_checking() {
 				int pushing = rand() % 10000;
 
                 int where = rand() % 2;
-
+				if (DEBUG)
 				std::cout << "push " << pushing;
 
                 if (where == 0) {
                     xlist.push_front(pushing);
                     stdlist.push_front(pushing);
 
+					if (DEBUG)
 					std::cout << " front\n";
                 } else {
                     xlist.push_back(pushing);
                     stdlist.push_back(pushing);
 
+					if (DEBUG)
 					std::cout << " back\n";
                 }
 
@@ -148,8 +151,10 @@ int random_checking() {
 					xlist.push_back(pushing);
 					stdlist.push_back(pushing);
 
-					std::cout << "push " << pushing;
-					std::cout << " back\n";
+					if (DEBUG) {
+						std::cout << "push " << pushing;
+						std::cout << " back\n";
+					}
 					continue;
 				}
 
@@ -162,6 +167,7 @@ int random_checking() {
                     ++xiter;
 				}
 
+				if (DEBUG)
 				std::cout << "insert " << pushing << " after " << index << "\n";
 
 				stdlist.insert(iter, pushing);
@@ -184,6 +190,7 @@ int random_checking() {
                     ++xiter;
                 }
 
+				if (DEBUG)
 				std::cout << "erase " << index << "\n";
 
                 xlist.erase(xiter);
@@ -207,6 +214,7 @@ int random_checking() {
                     ++xiter;
                 }
 
+				if (DEBUG)
 				std::cout << "set " << val << " from " << index << "\n";
 
                 *iter = val;
@@ -239,14 +247,17 @@ int random_checking() {
 
                 int where = rand() % 2;
 
+				if (DEBUG)
 				std::cout << "pop ";
 
                 if (where == 0) {
+					if (DEBUG)
 					std::cout << "front\n";
 
                     xlist.pop_front();
                     stdlist.pop_front();
                 } else {
+					if (DEBUG)
 					std::cout << "back\n";
 
                     xlist.pop_back();
