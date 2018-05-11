@@ -11,20 +11,50 @@ int main() {
 	StackAlloc<int> sa;
 	XorList<int, std::allocator<int> > xl(stdal);
 
-	xl.push_front(5);
+	xl.push_back(1);
 	XorListIterator<int, std::allocator<int> > titer = xl.begin();
-	xl.insert_before(titer, 6);
-	xl.push_front(4);
-	xl.push_back(7);
-	xl.pop_back();
-	xl.pop_back();
-	xl.push_back(5);
-	xl.push_front(7);
+	xl.insert_after(titer, 2);
+
+	titer = xl.begin();
+	titer++;
+	xl.erase(titer);
+
+	xl.push_back(3);
+
+	auto xiter = xl.begin();
+	for (int j = 0; j < xl.size(); ++j) {
+		std::cout << *xiter << " ";
+		++xiter;
+	} std::cout << '\n';
+
+
+	//////////////////////
+	titer = xl.begin();
+
+	xl.push_back(1);
+	xl.insert_after(titer, 2);
+
+	titer = xl.begin();
+	titer++;
+	xl.insert_after(titer, 3);
+
+	xl.push_front(5);
+	xl.push_back(6);
+	
+	titer = xl.begin();
+	titer++;
+	xl.insert_after(titer, 7);
+
+	xiter = xl.begin();
+	for (int j = 0; j < xl.size(); ++j) {
+		std::cout << *xiter << " ";
+		++xiter;
+	} std::cout << '\n';
+
 
 	titer = xl.begin();
 	++titer; 
 	++titer; 
-	++titer;
 	xl.erase(titer);
 
 	titer = xl.begin();
@@ -194,7 +224,7 @@ int random_checking() {
                 auto iter = stdlist.begin();
                 for (int j = 0; j < stdlist.size(); ++j) {
                     if (*iter != *xiter)
-                        std::cout << "Error: " << *iter << " from std != " << *xiter;
+                        //std::cout << "Error: " << *iter << " from std != " << *xiter;
 
 					++iter;
 					++xiter;

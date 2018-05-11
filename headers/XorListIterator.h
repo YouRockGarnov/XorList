@@ -19,7 +19,7 @@ class XorList;
 
  	XorListIterator(const XorListIterator &other) = default;
 
- 	T* operator->() {
+ 	T& operator->() {
  		return node->get_value();
  	}
 
