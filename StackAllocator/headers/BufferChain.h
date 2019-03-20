@@ -7,7 +7,7 @@ using ptr = T*;//std::shared_ptr<T>;
 				 //using chain = std::list<std::shared_ptr<T> >;
 
 struct block {
-	constexpr static const int buffer_capacity = 1024;
+	constexpr static const int buffer_capacity = 4096;
 	char buffer[buffer_capacity];
 };
 
@@ -32,6 +32,7 @@ public:
 
 	void add_block() {
 		_chain.push_back(block());
+		rec_buf_size = 0;
 	}
 
 private:
